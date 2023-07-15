@@ -1,38 +1,34 @@
-import cheerio from "cheerio";
-import axios from "axios";
+import { GetResultsFromYuplay } from "./Yuplay.jsx";
+import { GetResultsFromCdKeys } from "./CdKeys.jsx";
+import { GetResultsFromFanatical } from "./Fanatical.jsx";
+import { GetResultsFromGamesPlanet } from "./GamesPlanet.jsx";
+import { Blender} from "./Blender.js"
+import { NextResponse } from 'next/server'
+
 
 export async function POST(req, res) {
     const data = await req.json();
+    console.log(req);
     console.log(data);
-    console.log("Submitting...");
-
+    console.log('Objeto res:', res); // Verificar el objeto res
     console.log("Scraping...");
-    const response = await axios.get(
-        "https://www.yuplay.com/products/?search=" + data.search
-    );
 
-    const $ = cheerio.load(response.data);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    try {
+        const results1 = await GetResultsFromYuplay(data.search);
+        const results2 = await GetResultsFromGamesPlanet(data.search);
 
-    const results = [];
-    $("article.catalog-item").each((index, element) => {
-        const title = $(element)
-            .find("div.catalog-item-name a")
-            .text()
-            .trim();
-        const priceSale = $(element)
-            .find(".catalog-item-sale-price")
-            .text()
-            .trim();
-        results.push({
-            index: index,
-            title: title,
-            price: priceSale,
-        });
-    });
-    console.log(results);
-}
+        //console.log("Resultados de Yuplay: \n", results1);
+        //console.log("Resultados de Games Planet: \n", results2);
 
-export async function GET(req, res) {
-    res.status(200).json({ message: "GET request received" });
+        const final = Blender(results1, results2);
+        console.log(final);
+        console.log('final');
+        
+        return NextResponse.json(final)
+
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Error'})
+        // res.status(500).json({ error: 'Hubo un problema en el servidor' });
+    }
 }
