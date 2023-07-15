@@ -1,6 +1,4 @@
 import { GetResultsFromYuplay } from "./Yuplay.jsx";
-import { GetResultsFromCdKeys } from "./CdKeys.jsx";
-import { GetResultsFromFanatical } from "./Fanatical.jsx";
 import { GetResultsFromGamesPlanet } from "./GamesPlanet.jsx";
 import { Blender} from "./Blender.js"
 import { NextResponse } from 'next/server'
